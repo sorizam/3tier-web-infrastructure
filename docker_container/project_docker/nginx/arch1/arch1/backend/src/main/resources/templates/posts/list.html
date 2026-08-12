@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>게시판 - Arch1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/}" class="text-2xl font-bold text-blue-600">Arch1</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">홈</a>
+                    <a th:href="@{/about}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">대시보드</a>
+                    <a th:href="@{/posts}" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">게시판</a>
+                    <form th:action="@{/logout}" method="post" class="inline">
+                        <button type="submit" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">로그아웃</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-gray-900">게시판</h1>
+            <a th:href="@{/posts/create}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">
+                새 게시글 작성
+            </a>
+        </div>
+
+        <!-- Search Form -->
+        <div class="bg-white shadow rounded-lg mb-6">
+            <div class="px-4 py-5 sm:p-6">
+                <form th:action="@{/posts}" method="get" class="flex space-x-4">
+                    <div class="flex-1">
+                        <input type="text" name="search" th:value="${search}" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500" 
+                               placeholder="게시글 검색...">
+                    </div>
+                    <button type="submit" class="bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-gray-700">
+                        검색
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Posts List -->
+        <div class="bg-white shadow rounded-lg">
+            <div class="px-4 py-5 sm:p-6">
+                <div th:if="${#lists.isEmpty(posts.content)}" class="text-center text-gray-500 py-8">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <h3 class="mt-2 text-sm font-medium text-gray-900">게시글이 없습니다</h3>
+                    <p class="mt-1 text-sm text-gray-500">첫 번째 게시글을 작성해보세요.</p>
+                    <div class="mt-6">
+                        <a th:href="@{/posts/create}" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            새 게시글 작성
+                        </a>
+                    </div>
+                </div>
+
+                <div th:if="${!#lists.isEmpty(posts.content)}" class="space-y-4">
+                    <div th:each="post : ${posts.content}" class="border-b border-gray-200 pb-4 last:border-b-0">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    <a th:href="@{/posts/{id}(id=${post.id})}" th:text="${post.title}" class="hover:text-blue-600"></a>
+                                </h3>
+                                <div class="mt-2 flex items-center text-sm text-gray-500">
+                                    <span th:text="${post.author.fullName}">작성자</span>
+                                    <span class="mx-2">•</span>
+                                    <span th:text="${#temporals.format(post.createdAt, 'yyyy-MM-dd HH:mm')}">2024-01-01</span>
+                                    <span class="mx-2">•</span>
+                                    <span th:text="${post.viewCount} + ' 조회'">0 조회</span>
+                                </div>
+                                <p th:if="${post.content}" class="mt-2 text-sm text-gray-600" th:text="${#strings.abbreviate(post.content, 200)}">
+                                    게시글 내용...
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <div th:if="${posts.totalPages > 1}" class="bg-white shadow rounded-lg mt-6">
+            <div class="px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    <a th:if="${posts.hasPrevious()}" th:href="@{/posts(page=${posts.number - 1}, search=${search})}" 
+                       class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        이전
+                    </a>
+                    <a th:if="${posts.hasNext()}" th:href="@{/posts(page=${posts.number + 1}, search=${search})}" 
+                       class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        다음
+                    </a>
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            <span th:text="${posts.numberOfElements}">0</span>개 중 
+                            <span th:text="${posts.number * posts.size + 1}">1</span> - 
+                            <span th:text="${posts.number * posts.size + posts.numberOfElements}">10</span>개
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                            <a th:if="${posts.hasPrevious()}" th:href="@{/posts(page=${posts.number - 1}, search=${search})}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">이전</span>
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                            
+                            <span th:each="pageNum : ${#numbers.sequence(0, posts.totalPages - 1)}" 
+                                  th:class="${pageNum == posts.number} ? 'relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600' : 'relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50'">
+                                <a th:href="@{/posts(page=${pageNum}, search=${search})}" th:text="${pageNum + 1}">1</a>
+                            </span>
+                            
+                            <a th:if="${posts.hasNext()}" th:href="@{/posts(page=${posts.number + 1}, search=${search})}" 
+                               class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <span class="sr-only">다음</span>
+                                <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

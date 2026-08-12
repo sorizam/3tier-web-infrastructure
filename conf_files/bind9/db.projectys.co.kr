@@ -1,0 +1,31 @@
+$TTL 604800
+@   IN  SOA dns.projectys.co.kr. admin.projectys.co.kr. (
+            2025102701 ; Serial
+            604800     ; Refresh
+            86400      ; Retry
+            2419200    ; Expire
+            604800 )   ; Negative Cache TTL
+
+; Name server
+@       IN  NS  dns.projectys.co.kr.
+dns    IN  A   192.168.11.250
+
+; Root domain (projectys.co.kr) → Web Load Balancer
+@       IN  A   192.168.11.29
+
+; Load balancers
+weblb   IN  A   192.168.11.29
+applb   IN  A   192.168.11.39
+dblb    IN  A   192.168.11.109
+
+; Web tier
+web1    IN  A   192.168.11.20
+web2    IN  A   192.168.11.21
+
+; App tier
+app1    IN  A   192.168.11.30
+app2    IN  A   192.168.11.31
+
+; Database tier
+db1     IN  A   192.168.11.100
+db2     IN  A   192.168.11.101

@@ -1,0 +1,76 @@
+spring:
+  application:
+    name: arch1-webapp
+  
+  # Database Configuration
+  datasource:
+    url: jdbc:mysql://192.168.11.100:3306/arch1db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: admin
+    password: 1qaz@WSX
+  
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        connection:
+          characterEncoding: UTF-8
+          useUnicode: true
+  
+  # H2 Console (for development) - disabled for production
+  h2:
+    console:
+      enabled: false
+      path: /h2-console
+  
+  # Thymeleaf Configuration
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+    encoding: UTF-8
+    mode: HTML
+  
+  # Security Configuration
+  security:
+    user:
+      name: admin
+      password: admin123
+      roles: ADMIN
+  
+  # Static Resources
+  web:
+    resources:
+      static-locations: classpath:/static/
+  
+  # Jackson Configuration
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Seoul
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    context-path: /backend
+
+# Logging Configuration
+logging:
+  level:
+    com.arch1: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
+# Custom Application Properties
+app:
+  name: Arch1 Web Application
+  version: 1.0.0
+  description: 3-Tier Architecture Web Application

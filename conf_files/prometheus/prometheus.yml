@@ -1,0 +1,78 @@
+# my global config
+global:
+  scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+  evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+  # scrape_timeout is set to the global default (10s).
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          # - alertmanager:9093
+
+# Load rules once and periodically evaluate them according to the global 'evaluation_interval'.
+rule_files:
+  # - "first_rules.yml"
+  # - "second_rules.yml"
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+  - job_name: "prometheus"
+
+    # metrics_path defaults to '/metrics'
+    # scheme defaults to 'http'.
+
+    static_configs:
+      - targets: ["localhost:9090"]
+       
+
+  - job_name: "nginx"
+    static_configs:
+      - targets: ["192.168.11.20:9114"]  # nginx_exporter가 설치된 VM IP
+
+  - job_name: "apache"
+    static_configs:
+      - targets: ["192.168.11.21:9117"]  # apache_exporter가 설치된 VM IP
+
+
+        # The label name is added as a label `label_name=<label_value>` to any timeseries scraped from this config.
+        labels:
+          app: "prometheus"
+  - job_name: "node_exporters"
+    static_configs:
+      - targets: ["192.168.11.20:9100"]
+        labels:
+          instance: "web1"
+      - targets: ["192.168.11.21:9100"]
+        labels:
+          instance: "web2"
+      - targets: ["192.168.11.29:9100"]
+        labels:
+          instance: "web_lb"
+      - targets: ["192.168.11.30:9100"]
+        labels:
+          instance: "app1"
+      - targets: ["192.168.11.31:9100"]
+        labels:
+          instance: "app2"
+      - targets: ["192.168.11.39:9100"]
+        labels:
+          instance: "app_lb"
+      - targets: ["192.168.11.100:9100"]
+        labels:
+          instance: "db_master"
+      - targets: ["192.168.11.101:9100"]
+        labels:
+          instance: "db_replica"
+      - targets: ["192.168.11.109:9100"]
+        labels:
+          instance: "db_lb"
+      - targets: ["192.168.11.200:9100"]
+        labels:
+          instance: "nfs"
+      - targets: ["192.168.11.50:9100"]
+        labels:
+          instance: "k6"

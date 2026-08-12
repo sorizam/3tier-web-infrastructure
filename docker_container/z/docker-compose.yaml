@@ -1,0 +1,47 @@
+
+# Ubuntu 24.04 기본 이미지를 사용해서
+# nginx 설치 및 기본 설정 후 컨테이너 실행
+version: '3.8'
+
+services:
+  nginx-server: #nginx서버
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.ngx
+      args:
+        #listen ${NGINX_SERVER_PORT};을 지정해주지 않고 listen 80으로 설정해주었기 때문에 생략
+        # NGINX_SERVER_PORT: 80
+        NGINX_SERVER_ROOT: /var/www/html
+    ports:
+      - "8080:80"
+    depends_on: # 넘겨줄 컨테이너 지정
+      - django-server
+    volumes:
+      - static-volume:/usr/src/app/staticfiles
+      - media-volume:/media
+
+  django-server: #django 서버
+    build: 
+      context: ./django
+      dockerfile: Dockerfile.django
+    # wsgi.py 파일안에 application 객체
+    # gunicorn이 django앱을 실행하려면 wsgi.py에 있는 application객체를 import해서 실행해야한다.
+    # Django는 WSGI앱을 따르고 gunicorn은 WSGI앱을 실행해주는 서버
+    # Django 컨테이너는 시작과 동시에 collectstatic 명령으로 정적 파일을 모으고,Gunicorn을 통해 Django 앱을 실행
+    command: >
+      bash -c "python3 manage.py collectstatic --noinput &&
+              gunicorn community_board_project.wsgi:application --bind 0.0.0.0:8000"
+    expose:
+      - "8000"
+    volumes:
+    # /static 경로에 static-volume이라는 도커 볼륨 저장소를 연결
+      - static-volume:/usr/src/app/staticfiles   # django에서 정적파일이 /static에 저장되면, nginx컨테이너도 접근 가능
+      - media-volume:/media
+    environment:
+      - DEBUG=True
+
+# 볼륨
+volumes:
+  static-volume:
+  media-volume:
+

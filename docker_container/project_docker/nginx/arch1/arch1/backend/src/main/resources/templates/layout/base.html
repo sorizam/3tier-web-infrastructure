@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${title} ? ${title} + ' - Arch1' : 'Arch1'">Arch1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a th:href="@{/}" class="text-2xl font-bold text-blue-600">Arch1</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a th:href="@{/}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">홈</a>
+                    <a th:href="@{/about}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    
+                    <!-- Authenticated User Menu -->
+                    <div sec:authorize="isAuthenticated()" class="relative">
+                        <div class="flex items-center space-x-4">
+                            <a th:href="@{/dashboard}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">대시보드</a>
+                            <a th:href="@{/posts}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">게시판</a>
+                            <div class="relative">
+                                <button class="flex items-center text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">
+                                    <span sec:authentication="name">사용자</span>
+                                    <svg class="ml-1 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden">
+                                    <a th:href="@{/posts/create}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">글쓰기</a>
+                                    <form th:action="@{/logout}" method="post" class="block">
+                                        <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">로그아웃</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Guest Menu -->
+                    <div sec:authorize="!isAuthenticated()" class="flex items-center space-x-4">
+                        <a th:href="@{/login}" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">로그인</a>
+                        <a th:href="@{/register}" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">회원가입</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Flash Messages -->
+    <div th:if="${success}" class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+            <span th:text="${success}"></span>
+        </div>
+    </div>
+    
+    <div th:if="${error}" class="max-w-7xl mx-auto px-4 mt-4">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <span th:text="${error}"></span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 px-4">
+        <div th:replace="${content}">
+            <!-- Content will be inserted here -->
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 mt-12">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-base text-gray-400">&copy; 2024 Arch1. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/script.js}"></script>
+</body>
+</html>

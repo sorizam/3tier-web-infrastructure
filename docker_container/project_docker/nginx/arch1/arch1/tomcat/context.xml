@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<!-- The contents of this file will be loaded for each web application -->
+<Context>
+
+    <!-- Default set of monitored resources. If one of these is changed, the    -->
+    <!-- web application will be reloaded.                                   -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
+
+    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
+    <!--
+    <Manager pathname="" />
+    -->
+
+    <!-- Database connection pool for Arch1 application -->
+    <Resource name="jdbc/arch1db" 
+              auth="Container" 
+              type="javax.sql.DataSource"
+              maxTotal="20" 
+              maxIdle="10"
+              maxWaitMillis="-1"
+              username="admin" 
+              password="1qaz@WSX"
+              driverClassName="com.mysql.cj.jdbc.Driver"
+              url="jdbc:mysql://192.168.11.100:3306/arch1db?useSSL=false&amp;serverTimezone=Asia/Seoul&amp;characterEncoding=UTF-8&amp;allowPublicKeyRetrieval=true"
+              validationQuery="SELECT 1"
+              testOnBorrow="true"
+              testOnReturn="false"
+              testWhileIdle="true"
+              timeBetweenEvictionRunsMillis="60000"
+              minEvictableIdleTimeMillis="30000"
+              initialSize="5"
+              removeAbandoned="true"
+              removeAbandonedTimeout="60"
+              logAbandoned="true"
+              />
+
+    <!-- JNDI Environment entries -->
+    <Environment name="app/database/url" 
+                 value="jdbc:mysql://192.168.11.100:3306/arch1db" 
+                 type="java.lang.String" override="false"/>
+    <Environment name="app/database/username" 
+                 value="admin" 
+                 type="java.lang.String" override="false"/>
+    <Environment name="app/database/password" 
+                 value="1qaz@WSX" 
+                 type="java.lang.String" override="false"/>
+    <Environment name="app/database/driver" 
+                 value="com.mysql.cj.jdbc.Driver" 
+                 type="java.lang.String" override="false"/>
+
+    <!-- Application specific settings -->
+    <Environment name="app/name" 
+                 value="Arch1 Web Application" 
+                 type="java.lang.String" override="false"/>
+    <Environment name="app/version" 
+                 value="1.0.0" 
+                 type="java.lang.String" override="false"/>
+    <Environment name="app/environment" 
+                 value="production" 
+                 type="java.lang.String" override="false"/>
+
+</Context>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arch1 - About</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <a href="index.html" class="text-2xl font-bold text-blue-600">Arch1</a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-700 hover:text-blue-600 px-3 py-2 rounded-md text-sm font-medium">홈</a>
+                    <a href="about.html" class="text-blue-600 px-3 py-2 rounded-md text-sm font-medium">About</a>
+                    <a href="../backend/login" class="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700">로그인</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <div class="bg-white">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl md:text-6xl">
+                    <span class="block">About</span>
+                    <span class="block text-blue-600">Arch1</span>
+                </h1>
+                <p class="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
+                    3티어 아키텍처를 기반으로 한 현대적인 웹 서비스 플랫폼입니다.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Architecture Overview -->
+    <div class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">아키텍처</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    3티어 구성
+                </p>
+                <p class="mt-4 max-w-2xl text-xl text-gray-500 lg:mx-auto">
+                    프레젠테이션, 비즈니스 로직, 데이터 계층으로 분리된 구조
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <div class="space-y-10 md:space-y-0 md:grid md:grid-cols-3 md:gap-x-8 md:gap-y-10">
+                    <!-- Presentation Tier -->
+                    <div class="relative">
+                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-blue-500 text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div class="ml-16">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">프레젠테이션 계층</h3>
+                            <p class="mt-2 text-base text-gray-500">
+                                정적 페이지 (HTML, CSS, JS)와 동적 페이지 (Thymeleaf)를 제공합니다.
+                            </p>
+                            <ul class="mt-2 text-sm text-gray-500 list-disc list-inside">
+                                <li>정적 페이지: 홈, About</li>
+                                <li>동적 페이지: 로그인, 대시보드, 게시판</li>
+                                <li>Tailwind CSS 스타일링</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Business Logic Tier -->
+                    <div class="relative">
+                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-green-500 text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                            </svg>
+                        </div>
+                        <div class="ml-16">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">비즈니스 로직 계층</h3>
+                            <p class="mt-2 text-base text-gray-500">
+                                Spring Boot 기반의 애플리케이션 서버로 비즈니스 로직을 처리합니다.
+                            </p>
+                            <ul class="mt-2 text-sm text-gray-500 list-disc list-inside">
+                                <li>Spring Boot 3.x</li>
+                                <li>Spring Security</li>
+                                <li>Spring Data JPA</li>
+                                <li>Thymeleaf 템플릿 엔진</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Data Tier -->
+                    <div class="relative">
+                        <div class="absolute flex items-center justify-center h-12 w-12 rounded-md bg-purple-500 text-white">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" />
+                            </svg>
+                        </div>
+                        <div class="ml-16">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900">데이터 계층</h3>
+                            <p class="mt-2 text-base text-gray-500">
+                                데이터베이스 서버로 데이터를 저장하고 관리합니다.
+                            </p>
+                            <ul class="mt-2 text-sm text-gray-500 list-disc list-inside">
+                                <li>MySQL/PostgreSQL</li>
+                                <li>JPA/Hibernate</li>
+                                <li>데이터 영속성</li>
+                                <li>트랜잭션 관리</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Technology Stack -->
+    <div class="py-12 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="lg:text-center">
+                <h2 class="text-base text-blue-600 font-semibold tracking-wide uppercase">기술 스택</h2>
+                <p class="mt-2 text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                    사용 기술
+                </p>
+            </div>
+
+            <div class="mt-10">
+                <div class="grid grid-cols-2 gap-8 md:grid-cols-4">
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-blue-100">
+                            <span class="text-blue-600 font-bold text-lg">HTML</span>
+                        </div>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">HTML5</h3>
+                        <p class="mt-2 text-base text-gray-500">시맨틱 마크업</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-blue-100">
+                            <span class="text-blue-600 font-bold text-lg">CSS</span>
+                        </div>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Tailwind CSS</h3>
+                        <p class="mt-2 text-base text-gray-500">유틸리티 퍼스트 CSS</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-green-100">
+                            <span class="text-green-600 font-bold text-lg">Java</span>
+                        </div>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">Spring Boot</h3>
+                        <p class="mt-2 text-base text-gray-500">백엔드 프레임워크</p>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="flex items-center justify-center h-16 w-16 mx-auto rounded-full bg-purple-100">
+                            <span class="text-purple-600 font-bold text-lg">DB</span>
+                        </div>
+                        <h3 class="mt-4 text-lg font-medium text-gray-900">JPA</h3>
+                        <p class="mt-2 text-base text-gray-500">데이터 접근 계층</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-base text-gray-400">&copy; 2024 Arch1. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+$TTL 604800
+@   IN  SOA dns.projectys.co.kr. admin.projectys.co.kr. (
+            2025102701
+            604800
+            86400
+            2419200
+            604800 )
+@       IN  NS  dns.projectys.co.kr.
+
+250   IN  PTR dns.projectys.co.kr.
+29  IN  PTR weblb.projectys.co.kr.
+20  IN  PTR web1.projectys.co.kr.
+21  IN  PTR web2.projectys.co.kr.
+39  IN  PTR applb.projectys.co.kr.
+30  IN  PTR app1.projectys.co.kr.
+31  IN  PTR app2.projectys.co.kr.
+109  IN  PTR dblb.projectys.co.kr.
+100  IN  PTR db1.projectys.co.kr.
+101  IN  PTR db2.projectys.co.kr.

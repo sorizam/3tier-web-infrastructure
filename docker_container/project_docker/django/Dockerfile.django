@@ -1,0 +1,70 @@
+# 1. base 이미지
+FROM python:3.10-slim
+
+# 2. 시스템 업데이트 및 필요한 패키지 설치
+RUN apt-get update && apt-get install -y \
+    pkg-config \
+    default-libmysqlclient-dev \
+    build-essential \
+    git \
+    default-mysql-client \
+    && rm -rf /var/lib/apt/lists/*
+    # \
+    # software-properties-common 
+
+# RUN add-apt-repository -y ppa:deadsnakes/ppa && apt-get update -y
+
+# pkg-config	C 라이브러리 의존성 확인 툴
+# default-libmysqlclient-dev	MySQL용 C 헤더 및 라이브러리
+# build-essential	컴파일에 필요한 gcc, make 등 도구
+
+    
+# 3. GitHub에서 프로젝트 클론
+# RUN rm -rf /usr/src/django-community-board && \
+#     git clone https://github.com/AnByoungHyun/django-community-board.git /usr/src/django-community-board
+
+# 위에서 오류날 경우 로컬에서
+# git clone https://github.com/AnByoungHyun/django-community-board.git
+# cd django-community-board
+# docker build -t my-django-app 
+
+# STATIC_ROOT 디렉토리 생성 (collectstatic 에러 방지)
+# RUN mkdir -p /usr/src/app/staticfiles
+RUN mkdir -p /usr/src/app/staticfiles
+
+# 4. 작업 디렉토리 설정
+# 해당 경로에서 작업
+WORKDIR /usr/src/app
+
+COPY django_community_board/ /usr/src/app/
+COPY django_community_board/requirements.txt ./
+
+# 5. 필요한 패키지 설치
+# pip 라는 도구(프로그램) 자체 설치
+# pip : python 패키지를 설치할 수 있는 프로그램
+# RUN apt-get install -y python3-pip 
+
+# requirements.txt : python프로젝트가 필요한 라이브러리를 적어두는 곳 
+# requirements.txt를 설치하기 위해서는 pip명령어가 필요하다
+# --break-system-packages : pep 668 제한을 무시하고 시스템에 설치
+RUN pip3 install --break-system-packages -r requirements.txt
+
+# gunicorn 따로 설치
+RUN pip3 install --break-system-packages gunicorn
+
+# Dockerfile에 settings 경로 명시
+ENV DJANGO_SETTINGS_MODULE=community_board_project.settings
+# 컨테이너에서 파이썬 로그 바로 확인 가능
+ENV PYTHONUNBUFFERED=1 
+
+# 6. 정적 파일 수집
+RUN python3 manage.py collectstatic --noinput || true
+# RUN python3 manage.py collectstatic --noinput || cat static/logs/collectstatic.log
+
+# 7. 포트 개방
+EXPOSE 8000
+
+
+# 8. Gunicorn으로 실행
+# 프로젝트 실제 이름에 맞게 수정
+CMD ["gunicorn", "community_board_project.wsgi:application", "--bind", "0.0.0.0:8000"]

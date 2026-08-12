@@ -1,0 +1,31 @@
+# ubuntu 24.04 기본 이미지를 사용해서
+# nginx를 설치 및 기본 설정 후 컨테이너 실행
+FROM nginx:latest
+
+
+# nginx 기본 proxy_params 파일 복사
+COPY proxy_params /etc/nginx/proxy_params
+
+#온프레미스 구성 시 복사 경로
+COPY /arch1/arch1/* /var/www/html/
+COPY /arch1/arch1/frontend/* /var/www/html/
+
+# nginx 설정 파일 수정 (필요시)
+RUN chown -R www-data:www-data /var/www/html && \
+chmod -R 755 /var/www/html
+
+# 정적 웹사이트 소스코드를 nginx 웹 루트로 복사
+# 해당 vm에 저장# 도커파일에서 컨테이너 안으로 copy
+COPY sites-available/default /etc/nginx/conf.d/default.conf
+
+
+
+
+
+# 8000 포트 추천 이유 모르겠음음
+EXPOSE 8080
+
+# foreground에서 동작, 계속실행하는 상태
+CMD ["nginx", "-g", "daemon off;"]
+
+
