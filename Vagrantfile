@@ -310,7 +310,7 @@ end
       # Install Docker
       sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
 
-      echo ”rQSrTmj1QYaBfsDH8RMrPFoiZEY” | docker login --username ys111299 --password-stdin
+      echo ”” | docker login --username ys111299 --password-stdin
 
     SCRIPT
   end
