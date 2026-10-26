@@ -27,7 +27,6 @@ export function handleSummary(data) {
     console.log(JSON.stringify(data, null, 2)); // 데이터 구조 확인용
 
 	// Slack Webhook URL
-    //const webhookUrl = process.env.SLACK_WEBHOOK_URL;
     const WEBHOOK_URL = __ENV.SLACK_WEBHOOK_URL;
 
     //  안전하게 metric 값 가져오기 (undefined 방지)
@@ -57,9 +56,12 @@ export function handleSummary(data) {
 
 
     // Slack으로 POST 요청
-    http.post(webhookUrl, JSON.stringify(message), { headers: { 'Content-Type': 'application/json' } });
+    http.post(WEBHOOK_URL, JSON.stringify(message), {
+        headers: { 'Content-Type': 'application/json' }
+    });
 
     return {
         stdout: JSON.stringify(data), // 콘솔 출력도 유지
     };
+    
 }

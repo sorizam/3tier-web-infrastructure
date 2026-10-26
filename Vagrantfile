@@ -88,6 +88,29 @@ end
 
     SCRIPT
   end
+  
+  config.vm.define "nfs" do |nfs|
+    nfs.vm.box = "bento/ubuntu-22.04"
+    nfs.vm.hostname = "nfs"
+    nfs.vm.provider "vmware_desktop" do |vb|
+      vb.cpus = 2
+      vb.memory = 1024
+    end
+    nfs.vm.network "private_network", ip: "192.168.11.200"
+    nfs.vm.provision "shell", inline: <<-SCRIPT
+
+    sudo apt-get update -y
+    sudo apt-get install -y nfs-kernel-server
+
+    sudo systemctl start nfs-kernel-server
+    sudo systemctl enable nfs-kernel-server
+
+    sudo apt-get install -y python3-venv mysql-client python3-dev \
+    default-libmysqlclient-dev pkg-config libmysqlclient-dev \
+    build-essential nfs-common
+
+    SCRIPT
+  end
 
   config.vm.define "web1" do |web1|
     web1.vm.box = "bento/ubuntu-22.04"
@@ -150,6 +173,7 @@ end
     SCRIPT
   end
 
+
   config.vm.define "app1" do |app1|
     app1.vm.box = "bento/ubuntu-22.04"
     app1.vm.hostname = "app1"
@@ -203,29 +227,6 @@ end
 
     sudo systemctl start haproxy
     sudo systemctl enable haproxy
-
-    SCRIPT
-  end
-
-  config.vm.define "nfs" do |nfs|
-    nfs.vm.box = "bento/ubuntu-22.04"
-    nfs.vm.hostname = "nfs"
-    nfs.vm.provider "vmware_desktop" do |vb|
-      vb.cpus = 2
-      vb.memory = 1024
-    end
-    nfs.vm.network "private_network", ip: "192.168.11.200"
-    nfs.vm.provision "shell", inline: <<-SCRIPT
-
-    sudo apt-get update -y
-    sudo apt-get install -y nfs-kernel-server
-
-    sudo systemctl start nfs-kernel-server
-    sudo systemctl enable nfs-kernel-server
-
-    sudo apt-get install -y python3-venv mysql-client python3-dev \
-    default-libmysqlclient-dev pkg-config libmysqlclient-dev \
-    build-essential nfs-common
 
     SCRIPT
   end

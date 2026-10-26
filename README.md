@@ -162,7 +162,7 @@ flowchart TB
 | **Container** | Docker CE, Docker Compose |
 | **IaC** | Vagrant (Ruby) |
 | **Version Control** | Git |
-| **부가 앱** | Spring Boot 3.x (`arch1/`) — 별도 3-Tier Java 스택 *(참고용)* |
+| **부가 앱** | Spring Boot 3.x — 별도 3-Tier Java 스택 *(참고용, Compose 스택 미포함)* |
 
 ---
 
@@ -340,7 +340,7 @@ project1_ys/
 ├── Vagrantfile                  # IaC — 14대 VM 정의 및 프로비저닝
 ├── auto_scale.sh                # CPU 기반 web2 자동 기동 스크립트
 ├── redis.conf                   # Redis 설정 파일
-├── all_db.sql                   # MySQL 전체 데이터 덤프 (~162MB)
+├── all_db.sql                   # MySQL 전체 데이터 덤프 (~162MB, .gitignore 대상 — clone 시 없음)
 ├── all_schema.sql               # MySQL 스키마 덤프
 ├── test.sql                     # 테스트용 SQL
 │
@@ -355,21 +355,23 @@ project1_ys/
 │   ├── k6/                      #   k6 부하 테스트 스크립트
 │   └── docker/                  #   Docker Compose + Dockerfile
 │
-├── arch1/                       # Spring Boot 3-Tier 앱 (Java, 참고용)
-│   └── arch1/
-│       ├── frontend/            #   정적 HTML/CSS/JS
-│       ├── backend/             #   Spring Boot (Java 17)
-│       ├── nginx/               #   Nginx + Tomcat 배포 설정
-│       └── deploy/              #   설치 가이드
-│
 ├── docker_container/            # Docker 기반 대안 배포
 │   ├── project_docker/
-│   │   ├── docker-compose.yaml  #   Nginx + Django Compose
-│   │   ├── Dockerfile.ngx
-│   │   ├── Dockerfile.django
-│   │   ├── django/
-│   │   │   └── django_community_board/  # Django 커뮤니티 게시판
-│   │   └── nginx/
+│   │   ├── docker-compose.yaml  # ⭐ 사용 — nginx-server + django-server 2컨테이너
+│   │   ├── Dockerfile.ngx       # ⚠️ 미사용 사본 (nginx/Dockerfile.ngx와 바이트 동일)
+│   │   ├── Dockerfile.django    # ⚠️ 미사용 사본 (django/Dockerfile.django와 바이트 동일)
+│   │   │
+│   │   ├── nginx/               #   ← compose build context
+│   │   │   ├── Dockerfile.ngx   # ⭐ 사용 — 실제 nginx 이미지 빌드
+│   │   │   ├── proxy_params
+│   │   │   ├── sites-available/
+│   │   │   │   └── default      # ⭐ 사용 — conf.d/default.conf 로 복사되는 유일한 서버 설정
+│   │   │   └── arch1/arch1/     # ⚠️ 별도 Java 스택 — nginx 설정으로 로드되지 않음 (아래 절 참고)
+│   │   │
+│   │   └── django/              #   ← compose build context
+│   │       ├── Dockerfile.django        # ⭐ 사용 — 실제 django 이미지 빌드
+│   │       ├── proxy_params
+│   │       └── django_community_board/  # ⭐ 사용 — 웹앱 본체 (커뮤니티 게시판)
 │   └── z/
 │       └── docker-compose.yaml  #   실험용 Compose
 │
@@ -377,6 +379,78 @@ project1_ys/
     └── systemd/
         └── gunicorn.service     # Gunicorn systemd 유닛 파일
 ```
+
+> **📝 `arch1/` 위치 안내:** Spring Boot 기반 별도 3-Tier Java 스택(`frontend/` · `backend/` · `nginx/` · `tomcat/` · `deploy/`)은
+> 리포 루트가 아니라 **`docker_container/project_docker/nginx/arch1/arch1/`** 에 있습니다.
+> 루트의 `arch1_backup/` 사본은 `.gitignore` 대상이라 clone 시 포함되지 않습니다.
+
+> **📝 설정 파일 사본 안내:** `Dockerfile.ngx` · `Dockerfile.django` · `docker-compose.yaml` 은
+> ① `conf_files/docker/` ② `project_docker/` ③ 각 build context(`nginx/`, `django/`) 세 곳에 **바이트 단위로 동일한 사본**이 있습니다.
+> 빌드에 실제로 쓰이는 것은 **③ build context 안의 파일**이며, ①은 열람용 · ②는 미사용 사본입니다.
+
+---
+
+## 🐳 Docker Compose 대안 배포 구성
+
+VM 기반 구성과 별개로, `projectcontainer` VM(`192.168.11.150`)에서 **Nginx + Django 2컨테이너**로 동일한 웹앱을 배포한 구성입니다.
+
+### 컨테이너 구성
+
+| 서비스 | 이미지 빌드 | 포트 | 역할 |
+|--------|-------------|------|------|
+| `nginx-server` | `nginx/Dockerfile.ngx` (context `./nginx`) | `8080:80` | 리버스 프록시 · 정적 파일 서빙 |
+| `django-server` | `django/Dockerfile.django` (context `./django`) | `expose 8000` | Gunicorn WSGI (외부 비공개) |
+
+> `docker-compose.yaml`의 `dockerfile:` 값은 **`context:` 기준 상대 경로**로 해석됩니다.
+> 따라서 `project_docker/` 루트에 있는 동명의 Dockerfile 2개는 빌드에 참여하지 않습니다.
+
+### 요청 처리 흐름
+
+```
+Client → :8080 → nginx-server:80 ─┬─ location /        → proxy_pass django-server:8000 (Gunicorn)
+                                  └─ location /static/ → alias /usr/src/app/staticfiles/ (static-volume)
+```
+
+정적 파일은 `django-server`가 기동 시 `collectstatic`으로 `static-volume`에 모으고,
+`nginx-server`가 같은 볼륨을 마운트해 직접 서빙합니다. 즉 **정적/동적 요청이 컨테이너 단위로 분리**됩니다.
+
+| 구성 요소 | 값 |
+|-----------|-----|
+| 웹앱 | Django 커뮤니티 게시판 (`user_auth`, `attendance`) |
+| WSGI | Gunicorn — `community_board_project.wsgi:application` |
+| DB | MySQL Master(`192.168.11.100`) **직접 연결** *(ProxySQL 미경유)* |
+| 공유 볼륨 | `static-volume` (정적) · `media-volume` (업로드) |
+
+### ⚠️ `arch1/` 은 이 스택에서 동작하지 않습니다
+
+`nginx/arch1/arch1/` 은 **Spring Boot + Tomcat 기반의 완전히 별개 스택**이며,
+베어메탈 설치를 전제로 작성돼 있습니다(`deploy/INSTALLATION_GUIDE.md`). Compose 스택에서는 로드되지 않습니다.
+
+| 이유 | 근거 |
+|------|------|
+| **Nginx 설정으로 로드되지 않음** | `Dockerfile.ngx`가 `conf.d/`로 복사하는 서버 설정은 `sites-available/default` **하나뿐**. `arch1/nginx/sites-available/arch1`은 복사 대상이 아님 |
+| **백엔드가 존재하지 않음** | 해당 설정은 `proxy_pass http://127.0.0.1:8080` (Tomcat) 을 가리키지만, `docker-compose.yaml`에 Tomcat 서비스가 없음 |
+| **도메인 불일치** | `server_name arch1.local`. 실제 접속은 `192.168.11.150:8080` 이므로 이 server 블록에 매칭되지 않음 |
+| **단독 사용 시 기동 실패** | `limit_req zone=api` 를 참조하나 `limit_req_zone` 선언은 짝이 되는 `arch1/nginx/nginx.conf`에만 존재 → `conf.d/`에 단독 투입하면 nginx 기동 실패 |
+
+단, `Dockerfile.ngx`의 아래 두 줄 때문에 **파일 자체는 이미지 안에 남습니다.**
+
+```dockerfile
+COPY /arch1/arch1/* /var/www/html/
+COPY /arch1/arch1/frontend/* /var/www/html/
+```
+
+`COPY`에 와일드카드를 쓰면 매칭된 디렉터리는 **그 자체가 아니라 내용물이** 대상에 풀립니다.
+따라서 `backend/` · `database/` · `deploy/` · `nginx/` · `tomcat/` 의 내용이 `/var/www/html/` 에 평탄화되어 섞이며,
+질문의 `sites-available/arch1` 도 `/var/www/html/sites-available/arch1` 위치에 **일반 텍스트 파일로** 존재합니다(설정으로 해석되지 않음).
+
+`default` 설정의 `location /` 가 `try_files` 없이 곧바로 `proxy_pass` 하므로 `root /var/www/html;` 은 **사실상 죽은 지시어**이고,
+복사된 `arch1` 파일들은 **HTTP로 노출되지 않습니다.** 다만 이미지 레이어에는 그대로 남습니다.
+
+> **🔒 보안 유의:** 위 평탄화로 `application.yml` · `tomcat/context.xml` · `database/init.sql` 등
+> **DB 자격증명이 평문으로 포함된 파일**이 이미지에 함께 적재됩니다.
+> HTTP 노출은 없으나 이미지를 받은 사람은 레이어에서 추출할 수 있으므로, 레지스트리 푸시 전 정리가 필요합니다.
+> (`.dockerignore` 부재로 빌드 컨텍스트에도 `arch1` 트리 전체가 전송됩니다.)
 
 ---
 
