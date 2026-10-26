@@ -76,3 +76,8 @@ out/
 
 ##
 Vagrantfile_v1.txt
+all_db.sql
+all_schema.sql
+auto_scale.sh
+redis.conf
+test.sql
